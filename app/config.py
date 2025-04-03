@@ -1,9 +1,11 @@
-from pydantic import BaseSettings, Field, RedisDsn, PostgresDsn, AnyUrl, validator
-from typing import Optional, List, Dict, Any
+import os
 from enum import Enum
-import logging
+from dotenv import load_dotenv
 from pathlib import Path
+from pydantic import Field, RedisDsn
+from pydantic_settings import BaseSettings
 
+load_dotenv()
 class LogLevel(str, Enum):
     DEBUG = "DEBUG"
     INFO = "INFO"
@@ -11,43 +13,47 @@ class LogLevel(str, Enum):
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
 
-class EmbeddingModelType(str, Enum):
-    OPENAI = "openai"
-    HUGGINGFACE = "huggingface"
-    COHERE = "cohere"
-    LOCAL = "local"
-
 class Settings(BaseSettings):
     # 应用基础配置
-    app_name: str = Field("Enterprise RAG Agent", env="APP_NAME")
-    app_version: str = Field("0.0.1", env="APP_VERSION")
-    environment: str = Field("production", env="ENVIRONMENT")
-    debug: bool = Field(False, env="DEBUG")
-    log_level: LogLevel = Field(LogLevel.INFO, env="LOG_LEVEL")
-    
-    # API密钥配置
-    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
-    google_api_key: Optional[str] = Field(None, env="GOOGLE_API_KEY")
-    cohere_api_key: Optional[str] = Field(None, env="COHERE_API_KEY")
-    huggingfacehub_api_token: Optional[str] = Field(None, env="HF_API_TOKEN")
+    app_name: str = Field(env="APP_NAME")
+    app_description: str = Field(env="APP_DESCRIPTION")
+    app_version: str = Field(env="APP_VERSION")
+    docs_url: str = Field(env="DOCS_URL")
+    redoc_url: str = Field(env="REDOC_URL")
+    environment: str = Field(env="ENVIRONMENT")
+    debug: bool = Field(env="DEBUG")
+    log_level: LogLevel = Field(env="LOG_LEVEL")
     
     # 模型配置
-    llm_model: str = Field("gpt-3.5-turbo", env="LLM_MODEL")
-    embedding_model: str = Field("text-embedding-3-small", env="EMBEDDING_MODEL")
-    embedding_model_type: EmbeddingModelType = Field(EmbeddingModelType.OPENAI, env="EMBEDDING_MODEL_TYPE")
-    temperature: float = Field(0.7, ge=0.0, le=1.0, env="TEMPERATURE")
-    max_tokens: int = Field(1024, gt=0, env="MAX_TOKENS")
-    
+    model_name: str = Field(env="MODEL_NAME")
+    temperature: float = Field(env="TEMPERATURE")
+    max_tokens: int = Field(env="MAX_TOKENS")
+
+    openai_api_key: str = Field(env="OPENAI_API_KEY")
+
+    zhipuai_api_key: str = Field(env="ZHIPUAI_API_KEY")
+    zhipuai_api_base: str = Field(env="ZHIPUAI_API_BASE")
+    zhipuai_api_model: str = Field(env="ZHIPUAI_API_MODEL")
+    zhipuai_api_embedding: str = Field(env="ZHIPUAI_API_EMBEDDING")
+
+    deepseek_api_key: str = Field(env="DEEPSEEK_API_KEY")
+    deepseek_api_base: str = Field(env="DEEPSEEK_API_BASE")
+    deepseek_api_model: str = Field(env="DEEPSEEK_API_MODEL")
+
     # 数据库配置
-    redis_url: RedisDsn = Field("redis://localhost:6379/0", env="REDIS_URL")
-    cache_ttl: int = Field(3600, gt=0, env="CACHE_TTL")
+    redis_url: RedisDsn = Field(env="REDIS_URL")
+    cache_ttl: int = Field(env="CACHE_TTL")
+
+    vector_db_host: str = Field(env="VECTOR_DB_HOST")
+    vector_db_port: str = Field(env="VECTOR_DB_PORT")
     
     # 检索配置
-    top_k_retrieval: int = Field(5, gt=0, env="TOP_K_RETRIEVAL")
-    chunk_size: int = Field(1000, gt=0, env="CHUNK_SIZE")
-    chunk_overlap: int = Field(200, ge=0, env="CHUNK_OVERLAP")
+    top_k_retrieval: int = Field(env="TOP_K_RETRIEVAL")
+    chunk_size: int = Field(env="CHUNK_SIZE")
+    chunk_overlap: int = Field(env="CHUNK_OVERLAP")
     
     # 向量存储配置
-    vector_store_path: Path = Field(Path("./data/vector_store"), env="VECTOR_STORE_PATH")
-    similarity_threshold: float = Field(0.75, ge=0.0, le=1.0, env="SIMILARITY_THRESHOLD")
-    
+    files_path: Path = Field(env="FILES_PATH")
+    vector_store_path: Path = Field(env="VECTOR_STORE_PATH")
+    nexus_rag_collection: str = Field("nexus_rag_collection", env="VECTOR_COLLECTION_NAME")
+    similarity_threshold: float = Field(0, ge=0.0, le=1.0, env="SIMILARITY_THRESHOLD")
