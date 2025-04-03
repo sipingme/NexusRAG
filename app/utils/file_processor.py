@@ -3,7 +3,7 @@ from typing import Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from app.config import Settings
 from app.logger import initialize_logger
-from app.db.vector_storage import VectorStorage
+from app.stores.vector_storage import VectorStorage
 from .file_loader import FileLoaderRegistry
 
 settings = Settings()

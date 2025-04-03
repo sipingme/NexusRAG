@@ -6,15 +6,16 @@ from .chroma import ChromaStorage
 settings = Settings()
 
 class VectorStorage(ABC):
-    def __init__(self, embedding):
-        self.embedding = embedding
-
     @abstractmethod
     def store_documents(self, documents):
         pass
 
     @abstractmethod
     def similarity_search(self, query, k):
+        pass
+
+    @abstractmethod
+    def as_retriever():
         pass
 
     @abstractmethod
