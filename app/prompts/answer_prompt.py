@@ -1,9 +1,6 @@
 from langchain.prompts import ChatPromptTemplate
 
-class RAGPrompt:
-    def __init__(self, data):
-        self.data = data
-
+class AnswerPrompt:
     def from_template(self):
         return ChatPromptTemplate.from_template(
             """

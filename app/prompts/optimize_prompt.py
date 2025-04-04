@@ -1,9 +1,5 @@
 from langchain.prompts import ChatPromptTemplate
-
 class OptimizePrompt:
-   def __init__(self, data):
-      self.data = data
-
    def from_template(self):
       return ChatPromptTemplate.from_template(
       """

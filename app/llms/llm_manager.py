@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from .providers.zhipuai import ZHIPUAI
+from .providers.openai import OPENAI
 
 class LLMManager(ABC):
     @abstractmethod
@@ -9,6 +10,7 @@ class LLMManager(ABC):
     @classmethod
     def create_llm(cls, llm_type):
         llm_map = {
-            "zhipuai": ZHIPUAI
+            "zhipuai": ZHIPUAI,
+            "openai": OPENAI
         }
         return llm_map[llm_type]

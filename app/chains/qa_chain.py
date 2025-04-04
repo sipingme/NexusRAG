@@ -1,21 +1,25 @@
+import langchain
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from app.agents.rag_agent import RAGAgent
 from app.llms.llm_manager import LLMManager
-from app.prompts.optimize_prompt import OptimizePrompt
 from app.prompts.agent_prompt import AgentPrompt
-from app.prompts.rag_prompt import RAGPrompt
+from app.prompts.answer_prompt import AnswerPrompt
+from app.prompts.optimize_prompt import OptimizePrompt
 from app.stores.vector_storage import VectorStorage
 
 class QAChain:
     def __init__(self):
+        langchain.debug = False
+
         self.vector_db = VectorStorage.create_storage("chroma")
         self.retriever = self.vector_db.as_retriever()
-        self.llm = LLMManager.create_llm("zhipuai")
-        
-        prompt = RAGPrompt.from_template
-        tools = ""
-        self.agent = RAGAgent.agent_executor(self.llm, prompt, tools)
+        self.llm = LLMManager.create_llm("openai").initialize()
+
+        self.agent_prompt = AgentPrompt().from_messages()
+        self.answer_prompt = AnswerPrompt().from_template()
+        self.optimize_prompt = OptimizePrompt().from_template()
+        self.agent = RAGAgent(self.llm, self.retriever, self.agent_prompt, self.answer_prompt).execute()
 
     def executor(self, question):
         qa_pipeline = (
@@ -37,8 +41,8 @@ class QAChain:
                 question=lambda x: x["question"],
                 context=lambda x: x["context"]
             )
-            | OptimizePrompt.from_template
-            | self.llm.initialize
+            | self.optimize_prompt
+            | self.llm
             | StrOutputParser()
         )
     
@@ -48,11 +52,11 @@ class QAChain:
                 {"input": x["optimized_question"]}
             ),
             # .with_retry(stop=3)
-            # rag_result=RunnablePassthrough.assign(
-            #     question=lambda x: x["optimized_question"],
-            #     context=lambda x: self.retriever.invoke(x["optimized_question"])
-            # )
-            # | RAGPrompt.from_template
-            # | self.llm.initialize
-            # | StrOutputParser()
+            rag_result=RunnablePassthrough.assign(
+                question=lambda x: x["optimized_question"],
+                context=lambda x: self.retriever.invoke(x["optimized_question"])
+            )
+            | self.answer_prompt
+            | self.llm
+            | StrOutputParser()
         )
