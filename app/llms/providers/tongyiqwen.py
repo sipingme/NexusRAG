@@ -1,26 +1,24 @@
-from langchain_community.chat_models import ChatZhipuAI
+from langchain_community.chat_models.tongyi import ChatTongyi
 from app.config import Settings
 
 settings = Settings()
 
-class ZHIPUAI:
+class TONGYIQWEN:
     def __init__(self):
-        self.api_key = settings.zhipuai_api_key
-        self.api_base = settings.zhipuai_api_base
-        self.model = settings.zhipuai_api_model
+        self.api_key = settings.tongyi_api_key
+        self.model = settings.tongyi_api_model
         self.temperature = settings.temperature
         self.chat_model = self._initialize_chat_model()
 
     def _initialize_chat_model(self):
         try:
-            return ChatZhipuAI(
+            return ChatTongyi(
                 api_key=self.api_key,
-                api_base=self.api_base,
                 model=self.model,
                 temperature=self.temperature
             )
         except Exception as e:
-            raise RuntimeError(f"初始化 ChatZhipuAI 模型失败: {e}")
+            raise RuntimeError(f"初始化 ChatTongyi 模型失败: {e}")
 
     def get_chat_model(self):
         return self.chat_model

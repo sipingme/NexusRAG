@@ -30,15 +30,21 @@ class Settings(BaseSettings):
     max_tokens: int = Field(env="MAX_TOKENS")
 
     openai_api_key: str = Field(env="OPENAI_API_KEY")
+    openai_api_model: str = Field(env="OPENAI_API_MODEL")
+
+    tongyi_api_key: str = Field(env="TONGYI_API_KEY")
+    tongyi_api_base: str = Field(env="TONGYI_API_BASE")
+    tongyi_api_model: str = Field(env="TONGYI_API_MODEL")
+    tongyi_api_embedding: str = Field(env="TONGYI_API_EMBEDDING")
+
+    deepseek_api_key: str = Field(env="DEEPSEEK_API_KEY")
+    deepseek_api_base: str = Field(env="DEEPSEEK_API_BASE")
+    deepseek_api_model: str = Field(env="DEEPSEEK_API_MODEL")
 
     zhipuai_api_key: str = Field(env="ZHIPUAI_API_KEY")
     zhipuai_api_base: str = Field(env="ZHIPUAI_API_BASE")
     zhipuai_api_model: str = Field(env="ZHIPUAI_API_MODEL")
     zhipuai_api_embedding: str = Field(env="ZHIPUAI_API_EMBEDDING")
-
-    deepseek_api_key: str = Field(env="DEEPSEEK_API_KEY")
-    deepseek_api_base: str = Field(env="DEEPSEEK_API_BASE")
-    deepseek_api_model: str = Field(env="DEEPSEEK_API_MODEL")
 
     # 数据库配置
     redis_url: RedisDsn = Field(env="REDIS_URL")
@@ -53,6 +59,8 @@ class Settings(BaseSettings):
     chunk_overlap: int = Field(env="CHUNK_OVERLAP")
     
     # 向量存储配置
+    vector_store_name: str = Field(env="VECTOR_STORE_NAME")
+    
     files_path: Path = Field(env="FILES_PATH")
     vector_store_path: Path = Field(env="VECTOR_STORE_PATH")
     nexus_rag_collection: str = Field("nexus_rag_collection", env="VECTOR_COLLECTION_NAME")

@@ -1,6 +1,6 @@
 # import chromadb
-from typing import List
 from pathlib import Path
+from typing import List
 from langchain_chroma import Chroma
 from app.config import Settings
 from app.logger import initialize_logger

@@ -7,15 +7,22 @@ from app.prompts.agent_prompt import AgentPrompt
 from app.prompts.answer_prompt import AnswerPrompt
 from app.prompts.optimize_prompt import OptimizePrompt
 from app.stores.vector_storage import VectorStorage
+from app.config import Settings
+from langchain_openai import ChatOpenAI
 
+settings = Settings()
 class QAChain:
     def __init__(self):
         langchain.debug = False
 
-        self.vector_db = VectorStorage.create_storage("chroma")
+        self.vector_db = VectorStorage.create_storage(settings.vector_store_name)
         self.retriever = self.vector_db.as_retriever()
-        self.llm = LLMManager.create_llm("openai").initialize()
-
+        self.llm = LLMManager.create_llm(settings.model_name).get_chat_model()
+        # self.llm = ChatOpenAI(
+        #         openai_api_key=settings.openai_api_key,
+        #         model_name=settings.openai_api_model,
+        #         temperature=0
+        #     )
         self.agent_prompt = AgentPrompt().from_messages()
         self.answer_prompt = AnswerPrompt().from_template()
         self.optimize_prompt = OptimizePrompt().from_template()
@@ -52,11 +59,11 @@ class QAChain:
                 {"input": x["optimized_question"]}
             ),
             # .with_retry(stop=3)
-            rag_result=RunnablePassthrough.assign(
-                question=lambda x: x["optimized_question"],
-                context=lambda x: self.retriever.invoke(x["optimized_question"])
-            )
-            | self.answer_prompt
-            | self.llm
-            | StrOutputParser()
+            # rag_result=RunnablePassthrough.assign(
+            #     question=lambda x: x["optimized_question"],
+            #     context=lambda x: self.retriever.invoke(x["optimized_question"])
+            # )
+            # | self.answer_prompt
+            # | self.llm
+            # | StrOutputParser()
         )
